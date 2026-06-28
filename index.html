@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oráculo Cíclico: Las 13 Constelaciones</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #05000a;
+            --gold: #d4af37;
+            --gold-dim: rgba(212, 175, 55, 0.3);
+            --purple: #9d4edd;
+            --purple-dim: rgba(157, 78, 221, 0.3);
+            --text-main: #e0e0e0;
+            --text-muted: #94a3b8;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Montserrat', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+            padding: 20px;
+        }
+        .stars, .twinkling { position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: -1; pointer-events: none; }
+        .stars { background: #000 url('https://www.transparenttextures.com/patterns/stardust.png'); }
+        .twinkling { background: transparent url('https://www.transparenttextures.com/patterns/stardust.png'); opacity: 0.2; }
+        .oracle-container {
+            background: rgba(10, 2, 18, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--purple-dim);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 500px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 20px var(--purple-dim);
+            position: relative;
+            z-index: 1;
+            margin-bottom: 20px;
+        }
+        .mystic-icon { font-size: 2.5rem; margin-bottom: 10px; filter: drop-shadow(0 0 10px var(--gold)); }
+        .oracle-title { font-family: 'Cinzel Decorative', serif; color: var(--gold); font-size: 2.2rem; line-height: 1.1; }
+        .oracle-subtitle { font-family: 'Cinzel', serif; color: var(--purple); font-size: 0.8rem; letter-spacing: 3px; margin: 10px 0 25px; }
+        .instruction { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 30px; }
+        .input-group { margin-bottom: 30px; }
+        .date-input {
+            width: 100%;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid var(--gold-dim);
+            color: var(--gold);
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            padding: 15px;
+            border-radius: 8px;
+            outline: none;
+            text-align: center;
+            transition: 0.3s;
+        }
+        .date-input:focus { border-color: var(--gold); box-shadow: 0 0 15px var(--gold-dim); }
+        ::-webkit-calendar-picker-indicator { filter: invert(1) sepia(1) saturate(5) hue-rotate(5deg); cursor: pointer; }
+        .action-btn {
+            display: block; width: 100%; padding: 18px;
+            background: transparent; border: 1px solid;
+            border-radius: 4px; cursor: pointer;
+            font-family: 'Cinzel', serif; font-weight: bold; letter-spacing: 1.5px;
+            text-decoration: none; text-transform: uppercase; transition: all 0.4s ease;
+        }
+        .gold-glow { border-color: var(--gold); color: var(--gold); }
+        .gold-glow:hover { background: rgba(212, 175, 55, 0.15); box-shadow: 0 0 20px var(--gold-dim); transform: translateY(-2px); }
+        .purple-glow { border-color: var(--purple); color: var(--purple); margin-top: 15px;}
+        .purple-glow:hover { background: rgba(157, 78, 221, 0.15); box-shadow: 0 0 20px var(--purple-dim); transform: translateY(-2px); }
+        .ghost-btn { background: none; border: none; color: var(--text-muted); font-family: 'Montserrat'; font-size: 0.8rem; margin-top: 20px; text-decoration: underline; cursor: pointer; transition: 0.3s; }
+        .ghost-btn:hover { color: var(--gold); }
+        .result-header { margin-bottom: 30px; border-bottom: 1px dashed var(--purple-dim); padding-bottom: 20px; }
+        .eyebrow { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; }
+        .result-title { font-family: 'Cinzel Decorative', serif; color: var(--gold); font-size: 2rem; margin: 10px 0; text-shadow: 0 0 15px var(--gold-dim); }
+        .range-text { font-size: 0.85rem; color: var(--purple); font-style: italic; }
+        .alchemy-card { background: rgba(0,0,0,0.4); border-left: 3px solid var(--purple); padding: 20px; margin-bottom: 20px; text-align: left; border-radius: 0 8px 8px 0; }
+        .card-title { font-family: 'Cinzel', serif; font-size: 1rem; color: var(--text-main); margin-bottom: 8px; letter-spacing: 1px; }
+        .phase-highlight { color: var(--gold); font-size: 1.1rem; margin-bottom: 10px; font-weight: 600; }
+        .card-text { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; }
+        .cta-text { font-size: 0.85rem; color: var(--text-main); margin: 30px 0 15px; }
+        .hidden { display: none !important; }
+        .stage { transition: opacity 0.5s ease, transform 0.5s ease; }
+        .fade-out { opacity: 0; transform: scale(0.98); }
+        .fade-in { opacity: 1; transform: scale(1); animation: floatUp 0.6s ease forwards; }
+        @keyframes floatUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        footer { text-align: center; z-index: 1; position: relative; padding: 20px 0; width: 100%;}
+        .copyright { font-size: 0.8rem; color: #64748B; letter-spacing: 1px; }
+    </style>
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="twinkling"></div>
+    <main class="oracle-container">
+        <section id="input-stage" class="stage active">
+            <div class="mystic-icon">👁️</div>
+            <h1 class="oracle-title">Oráculo Cíclico</h1>
+            <p class="oracle-subtitle">SISTEMA ASTRONÓMICO DE 13 SIGNOS</p>
+            <p class="instruction">Las constelaciones han rotado. Tu signo zodiacal comercial es una ilusión. Introduce tu fecha de origen para revelar tu verdadera posición en la rueda alquímica.</p>
+            <div class="input-group"><input type="date" id="birthdate" class="date-input" required></div>
+            <button id="calculate-btn" class="action-btn gold-glow"><span>REVELAR MI VERDADERO ARQUETIPO</span></button>
+        </section>
+        <section id="report-stage" class="stage hidden">
+            <div class="result-header">
+                <span class="eyebrow">Tu Verdadera Constelación</span>
+                <h2 id="sign-name" class="result-title">Calculando...</h2>
+                <p id="astronomical-range" class="range-text">Alineando estrellas...</p>
+            </div>
+            <div class="alchemy-card">
+                <h3 class="card-title">Fase Alquímica Actual</h3>
+                <h4 id="phase-title" class="phase-highlight">...</h4>
+                <p id="phase-desc" class="card-text">...</p>
+            </div>
+            <div class="alchemy-card">
+                <h3 class="card-title">El Arquetipo Dominante</h3>
+                <p id="archetype-desc" class="card-text">...</p>
+            </div>
+            <div class="action-footer">
+                <p class="cta-text">¿Estás listo para transmutar esta energía?</p>
+                <a id="whatsapp-link" href="#" class="action-btn purple-glow" target="_blank"><span>AGENDAR SESIÓN DE INTEGRACIÓN</span></a>
+                <button id="reset-btn" class="ghost-btn">Consultar otro destino</button>
+            </div>
+        </section>
+    </main>
+    <footer><p class="copyright">© 2026 𝕾𝖔𝖑𝖛𝖊𝖓𝖘 𝕬𝖒𝖔𝖗𝖎𝖘. Oráculo Cíclico.</p></footer>
+    <script>
+        const zodiac13System = [
+            { name: "Capricornio", range: "20 Ene - 15 Feb", phase: "Fase de Putrefactio / Cristalización", desc: "La energía se concentra en la raíz. Estás en un ciclo donde las viejas estructuras de control deben colapsar para dar paso al núcleo real.", archetype: "El Guardián del Umbral. Te exige dominar la materia y transmutar la disciplina mecánica en soberanía espiritual.", check: (m, d) => (m === 1 && d >= 20) || (m === 2 && d <= 15) },
+            { name: "Acuario", range: "16 Feb - 11 Mar", phase: "Fase de Separatio / Disolución Mental", desc: "Ciclo de ruptura y desapego. Las corrientes del inconsciente colectivo inundan tu mente para limpiar los dogmas heredados.", archetype: "El Visionario Oculto. Te impulsa a romper la Matrix de lo cotidiano y observar tu reality desde una perspectiva cuántica.", check: (m, d) => (m === 2 && d >= 16) || (m === 3 && d <= 11) },
+            { name: "Piscis", range: "12 Mar - 18 Abr", phase: "Fase de Unio / Disolución Mística", desc: "El océano de la conciencia se traga la ilusión del ego. Estás en un ciclo de alta sensibilidad psíquica donde las sincronías son tu brújula.", archetype: "El Intérprete del Vacío. Te invita a rendirte ante el flujo de la Fuerza Inteligente y transmutar el dolor en medicina.", check: (m, d) => (m === 3 && d >= 12) || (m === 4 && d <= 18) },
+            { name: "Aries", range: "19 Abr - 13 May", phase: "Fase de Calcinatio / Ignición del Ser", desc: "Fuego primigenio. Tu ciclo actual exige purificación a través del movimiento y el coraje. La pasividad ahora transmuta en frustración.", archetype: "El Guerrero Alquímico. La fuerza vital se activa para derribar obstáculos. Canaliza la voluntad sin destruir tu entorno.", check: (m, d) => (m === 4 && d >= 19) || (m === 5 && d <= 13) },
+            { name: "Tauro", range: "14 May - 21 Jun", phase: "Fase de Coagulatio / Materialización", desc: "Ciclo de enraizamiento y absorción. Es el momento de fijar la energía volátil que encendiste. Conéctate con la geometría sagrada física.", archetype: "El Arquitecto de la Materia. Te recuerda que el cuerpo físico y la abundancia terrenal son el templo del espíritu.", check: (m, d) => (m === 5 && d >= 14) || (m === 6 && d <= 21) },
+            { name: "Géminis", range: "22 Jun - 20 Jul", phase: "Fase de Sublimatio / Dualidad Integrada", desc: "Ciclo de polaridad y puentes. Tu mente busca conectar conceptos aparentemente opuestos. Cuidado con la dispersión energética.", archetype: "El Mensajero de los Mundos. Capacidad innata para traducir el lenguaje del espíritu al plano terrenal.", check: (m, d) => (m === 6 && d >= 22) || (m === 7 && d <= 20) },
+            { name: "Cáncer", range: "21 Jul - 10 Ago", phase: "Fase de Solutio / Memoria del Agua", desc: "Ciclo de repliegue hacia el útero cósmico. Las memorias de tu linaje flotan a la superficie para ser transmutadas.", archetype: "El Tejedor Emocional. Te exige crear un santuario interno seguro antes de intentar sanar al mundo exterior.", check: (m, d) => (m === 7 && d >= 21) || (m === 8 && d <= 10) },
+            { name: "Leo", range: "11 Ago - 16 Sep", phase: "Fase de Fermentatio / El Sol Interno", desc: "Ciclo de irradiación. Estás llamado a ocupar tu espacio central sin pedir permiso. La timidez bloquea tu flujo.", archetype: "El Rey Soberano. El espejo del mundo te pide que dejes de buscar validación externa y reconozcas tu chispa divina.", check: (m, d) => (m === 8 && d >= 11) || (m === 9 && d <= 16) },
+            { name: "Virgo", range: "17 Sep - 30 Oct", phase: "Fase de Purificatio / Destilación", desc: "El ciclo de ordenamiento. Es tiempo de separar el trigo de la paja en tus hábitos y pensamientos. El discernimiento es tu espada.", archetype: "El Alquimista del Detalle. Te enseña que la Gran Obra se construye en la maestría sobre tus rituales diarios.", check: (m, d) => (m === 9 && d >= 17) || (m === 10 && d <= 30) },
+            { name: "Libra", range: "31 Oct - 23 Nov", phase: "Fase de Distillatio / Espejo de Almas", desc: "Ciclo de calibración. Tu reality exterior se convierte en un reflejo exacto de tu balance interno. Momento de evaluar la Sincronía.", archetype: "El Mediador de la Balanza. Te empuja a encontrar el punto cero entre el dar y el recibir, uniendo mente y corazón.", check: (m, d) => (m === 10 && d >= 31) || (m === 11 && d <= 23) },
+            { name: "Escorpio", range: "24 Nov - 29 Nov", phase: "Fase de Descensus / Fuego del Inframundo", desc: "Ciclo breve pero sísmico. Exige descender a la sombra, encarar tus miedos más profundos y tus deseos reprimidos para reciclarlos.", archetype: "El Fénix de las Cenizas. Muerte y renacimiento psicológico. Te dota de la fuerza para destruir tus ilusiones.", check: (m, d) => (m === 11 && d >= 24) || (m === 11 && d <= 29) },
+            { name: "Ofiuco", range: "30 Nov - 17 Dic", phase: "Fase de Transmutatio / La Serpiente", desc: "El signo oculto. Estás en un ciclo de integración de la polaridad (luz y sombra). La energía Kundalini se activa para sanar el karma.", archetype: "El Sanador Herido. Posees las llaves para extraer la medicina de tu propio veneno y elevar la conciencia de tu entorno.", check: (m, d) => (m === 11 && d >= 30) || (m === 12 && d <= 17) },
+            { name: "Sagitario", range: "18 Dic - 19 Ene", phase: "Fase de Projectio / Flecha del Destino", desc: "Ciclo de expansión. Tu conciencia apunta hacia el centro galáctico. Es tiempo de integrar la filosofía y la búsqueda de la verdad absoluta.", archetype: "El Buscador de Estrellas. Te impulsa a confiar en el Destino inteligente y lanzar tus intenciones con total certeza.", check: (m, d) => (m === 12 && d >= 18) || (m === 1 && d <= 19) }
+        ];
+        document.getElementById('calculate-btn').addEventListener('click', () => {
+            const dateInput = document.getElementById('birthdate').value;
+            if(!dateInput) { alert("La matriz requiere tu fecha de origen para operar."); return; }
+            const parts = dateInput.split('-');
+            const month = parseInt(parts[1], 10);
+            const day = parseInt(parts[2], 10);
+            const matchedSign = zodiac13System.find(sign => sign.check(month, day));
+            if (!matchedSign) return;
+            document.getElementById('sign-name').textContent = matchedSign.name;
+            document.getElementById('astronomical-range').textContent = `Constelación Activa: ${matchedSign.range}`;
+            document.getElementById('phase-title').textContent = matchedSign.phase;
+            document.getElementById('phase-desc').textContent = matchedSign.desc;
+            document.getElementById('archetype-desc').textContent = matchedSign.archetype;
+            const phone = "526221128639";
+            const message = `¡Hola 𝕾𝖔𝖑𝖛𝖊𝖓𝖘 𝕬𝖒𝖔𝖗𝖎𝖘! El Oráculo reveló que mi verdadera constelación es ${matchedSign.name} (${matchedSign.phase}). Necesito agendar una sesión para integrar este arquetipo.`;
+            document.getElementById('whatsapp-link').href = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+            const inputStage = document.getElementById('input-stage');
+            const reportStage = document.getElementById('report-stage');
+            inputStage.classList.add('fade-out');
+            setTimeout(() => {
+                inputStage.classList.add('hidden');
+                inputStage.classList.remove('fade-out');
+                reportStage.classList.remove('hidden');
+                reportStage.classList.add('fade-in');
+            }, 500);
+        });
+        document.getElementById('reset-btn').addEventListener('click', () => {
+            const inputStage = document.getElementById('input-stage');
+            const reportStage = document.getElementById('report-stage');
+            reportStage.classList.remove('fade-in');
+            reportStage.classList.add('fade-out');
+            setTimeout(() => {
+                reportStage.classList.add('hidden');
+                reportStage.classList.remove('fade-out');
+                document.getElementById('birthdate').value = '';
+                inputStage.classList.remove('hidden');
+                inputStage.classList.add('fade-in');
+                setTimeout(() => inputStage.classList.remove('fade-in'), 600);
+            }, 500);
+        });
+    </script>
+</body>
+</html>
